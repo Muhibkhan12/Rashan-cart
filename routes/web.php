@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Customer\OrderController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -37,13 +38,22 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-    // Customer area
+    // Customer area (static pages)
     Route::view('/customer/dashboard',  'customer.dashboard')->name('customer.dashboard');
-    Route::view('/customer/shop',       'customer.shop')->name('customer.shop');
-    Route::view('/customer/order',     'customer.orders')->name('customer.order');
     Route::view('/customer/deliveries', 'customer.deliveries')->name('customer.deliveries');
     Route::view('/customer/savings',    'customer.savings')->name('customer.savings');
     Route::view('/customer/profile',    'customer.profile')->name('customer.profile');
+
+    // Customer orders (real data from the database)
+    Route::get('/customer/orders',              [OrderController::class, 'index'])->name('customer.orders.index');
+    Route::get('/customer/orders/create',       [OrderController::class, 'create'])->name('customer.orders.create');
+    Route::post('/customer/orders',             [OrderController::class, 'store'])->name('customer.orders.store');
+    Route::post('/customer/orders/{id}/cancel', [OrderController::class, 'cancel'])->name('customer.orders.cancel');
+
+    // Old names kept so existing sidebar/links do not break
+    Route::redirect('/customer/order', '/customer/orders')->name('customer.order');
+    Route::redirect('/customer/shop',  '/customer/orders/create')->name('customer.shop');
+    Route::get('/customer/order-create', [OrderController::class, 'create'])->name('customer.order-create');
 
     // Other roles
     Route::view('/admin/dashboard',    'dashboards.admin')->name('admin.dashboard');

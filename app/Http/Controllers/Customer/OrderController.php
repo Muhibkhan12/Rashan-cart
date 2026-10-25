@@ -15,28 +15,15 @@ use Illuminate\Support\Str;
 
 /*
 |--------------------------------------------------------------------------
-| routes/web.php  (put inside your auth group)
+| Models need:
+|   Order      -> $fillable: order_number, user_id, address_id, delivery_address, delivery_area,
+|                 subtotal, delivery_fee, total_amount, status
+|                 public function items() { return $this->hasMany(OrderItem::class); }
+|   OrderItem  -> $fillable: order_id, product_id, product_name, quantity, unit_price, line_total
+|   Product     -> see Product.php (table: id, category_id, name, sku, unit, retail_price, image_path, is_active)
+|   Category    -> table: id, name
+|   Address     -> table: id, user_id, label, address, area
 |--------------------------------------------------------------------------
-| use App\Http\Controllers\Customer\OrderController;
-|
-| Route::middleware('auth')->prefix('customer')->name('customer.')->group(function () {
-|     Route::get('/orders',               [OrderController::class, 'index'])->name('orders.index');
-|     Route::get('/orders/create',        [OrderController::class, 'create'])->name('orders.create');
-|     Route::post('/orders',              [OrderController::class, 'store'])->name('orders.store');
-|     Route::post('/orders/{id}/cancel',  [OrderController::class, 'cancel'])->name('orders.cancel');
-| });
-|
-| app/Models/Order.php needs:
-|   protected $fillable = ['order_number','user_id','address_id','delivery_address','delivery_area',
-|                          'subtotal','delivery_fee','total_amount','status'];
-|   public function items() { return $this->hasMany(OrderItem::class); }
-|
-| app/Models/OrderItem.php needs:
-|   protected $fillable = ['order_id','product_id','product_name','quantity','unit_price','line_total'];
-|
-| Views:
-|   resources/views/customer/orders.blade.php         (your orders page, updated file)
-|   resources/views/customer/orders-create.blade.php  (new order page)
 */
 
 class OrderController extends Controller
@@ -55,25 +42,28 @@ class OrderController extends Controller
         return view('customer.orders', compact('orders'));
     }
 
-    /** New order page */
+    /** New order page: products + the customer's addresses */
     public function create()
     {
-        // Assumed products columns: id, name, category, price (group price),
-        // market_price (normal store price), is_active
-        $products = Product::where('is_active', true)
-            ->orderBy('category')
+        $products = Product::with('category')
+            ->where('is_active', true)
+            ->orderBy('category_id')
             ->orderBy('name')
             ->get()
             ->map(fn ($p) => [
-                'id'           => $p->id,
-                'name'         => $p->name,
-                'category'     => $p->category,
-                'price'        => (float) $p->price,
-                'market_price' => $p->market_price !== null ? (float) $p->market_price : null,
+                'id'       => $p->id,
+                'name'     => $p->name,
+                'sku'      => $p->sku,
+                'unit'     => $p->unit,
+                'category' => optional($p->category)->name,
+                'image'    => $this->imageUrl($p->image_path),
+                'price'    => (float) $p->retail_price,
+                // Savings: the page shows "You save" only when this is higher than price.
+                // The products table has no discount/market price yet, so it stays null.
+                'market_price' => null,
             ])
             ->values();
 
-        // Assumed addresses columns: id, user_id, label, address, area
         $addresses = Address::where('user_id', auth()->id())
             ->get()
             ->map(fn ($a) => [
@@ -84,7 +74,7 @@ class OrderController extends Controller
             ])
             ->values();
 
-        return view('customer.orders-create', [
+        return view('customer.order-create', [
             'products'    => $products,
             'addresses'   => $addresses,
             'deliveryFee' => self::DELIVERY_FEE,
@@ -124,7 +114,7 @@ class OrderController extends Controller
 
             foreach ($data['items'] as $item) {
                 $product   = $products[$item['product_id']];
-                $unitPrice = (float) $product->price;
+                $unitPrice = (float) $product->retail_price;
                 $lineTotal = round($unitPrice * $item['quantity'], 2);
                 $subtotal += $lineTotal;
 
@@ -156,7 +146,6 @@ class OrderController extends Controller
             return $order;
         });
 
-        // Shown as a toast on the My orders page.
         session()->flash('success', 'Order ' . $order->order_number . ' placed.');
 
         return response()->json([
@@ -180,5 +169,15 @@ class OrderController extends Controller
         $order->update(['status' => 'Cancelled']);
 
         return back()->with('success', 'Order ' . $order->order_number . ' cancelled. Nothing was charged.');
+    }
+
+    /** image_path can be a full URL, an absolute path, or a path inside storage/app/public */
+    private function imageUrl(?string $path): ?string
+    {
+        if (! $path) {
+            return null;
+        }
+
+        return Str::startsWith($path, ['http://', 'https://', '/']) ? $path : asset('storage/' . ltrim($path, '/'));
     }
 }
