@@ -74,7 +74,7 @@ class OrderController extends Controller
             ])
             ->values();
 
-        return view('customer.orders-create', [
+        return view('customer.order-create', [
             'products'    => $products,
             'addresses'   => $addresses,
             'deliveryFee' => self::DELIVERY_FEE,
@@ -151,7 +151,7 @@ class OrderController extends Controller
         return response()->json([
             'order_number' => $order->order_number,
             'total_amount' => (float) $order->total_amount,
-            'redirect'     => route('customer.orders.index'),
+            'redirect'     => route('customer.orders'),
         ], 201);
     }
 

@@ -63,13 +63,12 @@ input:focus,select:focus{border-color:var(--pf);box-shadow:0 0 0 4px color-mix(i
           <h1 class="text-2xl font-bold tracking-tight">My orders</h1>
           <p class="text-sm text-mu mt-1">You can cancel an order until it is confirmed.</p>
         </div>
-        <a href="{{ route('customer.order-create') }}" class="btn btn-p flex items-center gap-1.5">
+        <a href="{{ route('customer.orders.create') }}" class="btn btn-p flex items-center gap-1.5">
           <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
           New order
         </a>
       </div>
 
-      {{-- Status badge colours --}}
       @php
         $badgeColors = [
           'Placed'           => '#d19a3c',
@@ -92,7 +91,7 @@ input:focus,select:focus{border-color:var(--pf);box-shadow:0 0 0 4px color-mix(i
 
         @if ($orders->isEmpty())
           <p class="text-sm text-mu">No orders yet.</p>
-          <a href="{{ route('customer.order-create') }}" class="btn btn-p mt-3 inline-flex">Place your first order</a>
+          <a href="{{ route('customer.orders.create') }}" class="btn btn-p mt-3 inline-flex">Place your first order</a>
         @else
           <div class="overflow-x-auto -mx-2">
             <table class="w-full" id="otable">
@@ -177,7 +176,6 @@ input:focus,select:focus{border-color:var(--pf);box-shadow:0 0 0 4px color-mix(i
     d.dataset.theme = dk ? 'light' : 'dark';
   };
 
-  /* search orders */
   document.getElementById('gs').addEventListener('input', e => {
     const q = e.target.value.trim().toLowerCase();
     let shown = 0;
@@ -190,7 +188,6 @@ input:focus,select:focus{border-color:var(--pf);box-shadow:0 0 0 4px color-mix(i
     if (none) none.classList.toggle('hidden', shown > 0);
   });
 
-  /* messages from the server (order placed, order cancelled, errors) */
   @if (session('success'))
     toast(@json(session('success')));
   @endif

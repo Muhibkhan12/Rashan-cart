@@ -3,6 +3,9 @@
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Customer\OrderController;
+use App\Http\Controllers\Customer\ProfileController;
+use App\Http\Controllers\Customer\AddressController;
+use App\Http\Controllers\Customer\DashboardController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -11,21 +14,17 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 Route::middleware('guest')->group(function () {
-    // Login
     Route::get('/login',  [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login']);
 
-    // Register
     Route::get('/register',  [RegisterController::class, 'showRegister'])->name('register');
     Route::post('/register', [RegisterController::class, 'register']);
 
-    // Forgot / reset password
     Route::get('/forgot-password',  [AuthController::class, 'showForgot'])->name('password.request');
     Route::post('/forgot-password', [AuthController::class, 'sendReset'])->name('password.email');
     Route::get('/reset-password/{token}', [AuthController::class, 'showReset'])->name('password.reset');
     Route::post('/reset-password',        [AuthController::class, 'reset'])->name('password.update');
 
-    // Invitation
     Route::get('/activate',  [RegisterController::class, 'showInvite'])->name('invite.form');
     Route::post('/activate', [RegisterController::class, 'activate'])->name('invite.accept');
 });
@@ -40,24 +39,38 @@ Route::middleware('auth')->group(function () {
 
     /*
     |----------------------------------------------------------------------
-    | Customer area
+    | Customer — static pages
     |----------------------------------------------------------------------
     */
-
-    // Dashboard & static pages
     Route::view('/customer/dashboard',  'customer.dashboard')->name('customer.dashboard');
     Route::view('/customer/deliveries', 'customer.deliveries')->name('customer.deliveries');
     Route::view('/customer/savings',    'customer.savings')->name('customer.savings');
-    Route::view('/customer/profile',    'customer.profile')->name('customer.profile');
 
-    // Shop → create order (same form, friendly URL)
-    Route::get('/customer/shop', [OrderController::class, 'create'])->name('customer.shop');
+    /*
+    |----------------------------------------------------------------------
+    | Customer — profile & addresses
+    |----------------------------------------------------------------------
+    */
+    Route::get('/customer/profile', [ProfileController::class, 'show'])->name('customer.profile');
+    Route::put('/customer/profile', [ProfileController::class, 'update'])->name('customer.profile.update');
 
-    // Orders CRUD (real DB data)
+    Route::post('/customer/addresses',                    [AddressController::class, 'store'])->name('customer.addresses.store');
+    Route::patch('/customer/addresses/{address}/default', [AddressController::class, 'setDefault'])->name('customer.addresses.default');
+    Route::delete('/customer/addresses/{address}',        [AddressController::class, 'destroy'])->name('customer.addresses.destroy');
+
+    /*
+    |----------------------------------------------------------------------
+    | Customer — orders
+    |----------------------------------------------------------------------
+    */
     Route::get('/customer/orders',              [OrderController::class, 'index'])->name('customer.orders');
     Route::get('/customer/orders/create',       [OrderController::class, 'create'])->name('customer.orders.create');
     Route::post('/customer/orders',             [OrderController::class, 'store'])->name('customer.orders.store');
     Route::post('/customer/orders/{id}/cancel', [OrderController::class, 'cancel'])->name('customer.orders.cancel');
+
+    // Alias — keeps old links working without touching Blade files
+    Route::get('/customer/order-create', [OrderController::class, 'create'])->name('customer.order-create');
+    Route::get('/customer/shop',         [OrderController::class, 'create'])->name('customer.shop');
 
     /*
     |----------------------------------------------------------------------
@@ -86,3 +99,5 @@ Route::get('/', function () {
         default                => redirect()->route('customer.dashboard'),
     };
 });
+Route::get('/customer/dashboard', [\App\Http\Controllers\Customer\DashboardController::class, 'index'])
+    ->name('customer.dashboard');

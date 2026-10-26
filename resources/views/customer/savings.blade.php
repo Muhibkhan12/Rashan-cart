@@ -168,25 +168,7 @@ input:focus,select:focus{border-color:var(--pf);box-shadow:0 0 0 4px color-mix(i
             @endforeach
           </div>
         </section>
-
-      </div>
-
-      {{-- Recent savings --}}
-      <section class="card p-6 mt-4">
-        <div class="flex items-center justify-between gap-2 mb-4">
-          <h2 class="font-semibold text-base">Recent savings</h2>
-          <a href="{{ route('customer.orders') }}" class="btn">View all orders</a>
-        </div>
-
-        <div class="overflow-x-auto -mx-2">
-          <table class="w-full">
-            <thead>
-              <tr>
-                <th class="text-left font-medium text-mu text-xs px-3.5 py-2">Order</th>
-                <th class="text-left font-medium text-mu text-xs px-3.5 py-2">Item</th>
-                <th class="text-left font-medium text-mu text-xs px-3.5 py-2">Date</th>
-                <th class="text-right font-medium text-mu text-xs px-3.5 py-2">You saved</th>
-              </tr>
+ 
             </thead>
             <tbody>
               @foreach ($recentSavings as $r)

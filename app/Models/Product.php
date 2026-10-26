@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /*
 | products table: id, category_id, name, sku, unit, retail_price, image_path, is_active
@@ -29,5 +30,10 @@ class Product extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
+    }
+
+    public function campaigns(): HasMany
+    {
+        return $this->hasMany(Campaign::class);
     }
 }

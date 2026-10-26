@@ -80,7 +80,7 @@ select option{color:var(--tx);background:var(--sf)}
           <h1 class="text-2xl font-bold tracking-tight">New order</h1>
           <p class="text-sm text-mu mt-1">Choose your products, check the total, and place your order.</p>
         </div>
-        <a href="{{ route('customer.orders.index') }}" class="btn">Back to my orders</a>
+        <a href="{{ route('customer.orders') }}" class="btn">Back to my orders</a>
       </div>
 
       <div class="grid xl:grid-cols-[1fr_360px] gap-6 items-start">
