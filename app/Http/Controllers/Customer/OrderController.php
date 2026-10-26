@@ -69,12 +69,12 @@ class OrderController extends Controller
             ->map(fn ($a) => [
                 'id'      => $a->id,
                 'label'   => $a->label,
-                'address' => $a->address,
+                'address' => $this->addressText($a),
                 'area'    => $a->area,
             ])
             ->values();
 
-        return view('customer.order-create', [
+        return view('customer.orders-create', [
             'products'    => $products,
             'addresses'   => $addresses,
             'deliveryFee' => self::DELIVERY_FEE,
@@ -131,7 +131,7 @@ class OrderController extends Controller
                 'order_number'     => 'RC-' . now()->format('ymd') . '-' . strtoupper(Str::random(5)),
                 'user_id'          => auth()->id(),
                 'address_id'       => $address->id,
-                'delivery_address' => $address->address,   // snapshot: stays correct even if the address changes later
+                'delivery_address' => $this->addressText($address),   // snapshot: stays correct even if the address changes later
                 'delivery_area'    => $address->area,
                 'subtotal'         => $subtotal,
                 'delivery_fee'     => self::DELIVERY_FEE,
@@ -169,6 +169,27 @@ class OrderController extends Controller
         $order->update(['status' => 'Cancelled']);
 
         return back()->with('success', 'Order ' . $order->order_number . ' cancelled. Nothing was charged.');
+    }
+
+    /**
+     * The street/house text of an address. Your addresses table has no column called "address",
+     * so we try the usual names. If yours is different, add its name to this list
+     * (run `DESCRIBE addresses;` to see the real column names).
+     */
+    private function addressText($a): string
+    {
+        $columns = ['address', 'address_line', 'address_line1', 'address_line_1', 'street_address',
+                    'street', 'full_address', 'house_address', 'details'];
+
+        foreach ($columns as $col) {
+            $v = trim((string) ($a->{$col} ?? ''));
+            if ($v !== '') {
+                return $v;
+            }
+        }
+
+        // Last resort so the order never fails: label + area
+        return trim(implode(', ', array_filter([$a->label ?? null, $a->area ?? null])));
     }
 
     /** image_path can be a full URL, an absolute path, or a path inside storage/app/public */

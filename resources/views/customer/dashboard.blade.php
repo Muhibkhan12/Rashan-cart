@@ -143,7 +143,7 @@ const bars=(v,l)=>{const m=Math.max(...v);return `<div class="flex items-end gap
 const S={view:'home',cat:'All',q:'',
 prods:[{n:'Basmati rice 5 kg',c:'Staples',p:11.2,m:14.5,j:84,t:100,d:2},{n:'Cooking oil 5 L',c:'Oils',p:13.9,m:17.8,j:47,t:80,d:4},{n:'Fresh eggs, 30 tray',c:'Dairy and eggs',p:5.1,m:6.4,j:120,t:120,d:1},{n:'Wheat flour 10 kg',c:'Staples',p:8.4,m:10.9,j:22,t:60,d:6},{n:'Pulses bundle',c:'Staples',p:6.4,m:8.2,j:64,t:70,d:3},{n:'Sugar 5 kg',c:'Staples',p:4.9,m:6.1,j:38,t:90,d:5}],
 orders:[{id:'#1042',c:5,q:2,s:'Delivered',d:'Oct 12'},{id:'#1051',c:2,q:2,s:'Out for delivery',d:'Oct 21'},{id:'#1058',c:3,q:1,s:'Placed',d:'Oct 23'},{id:'#1060',c:0,q:1,s:'Packed',d:'Oct 22'}],
-addr:[['Home','House 12, Block 7',1],['Parents','Flat 4B, Block 9',0]],me:{name:'Ayesha Muhib',email:'ayesha.muhib@example.com',phone:'(555) 014-2290'},next:1061};
+addr:[['Home','House 12, Block 7',1],['Parents','Flat 4B, Block 9',0]],me:{name:'Ayesha',email:'ayesha@example.com',phone:'(555) 014-2290'},next:1061};
 /* order status flow: Placed -> Confirmed -> Packed -> Out for delivery -> Delivered */
 const stage={Placed:0,Confirmed:1,Packed:2,'Out for delivery':3,Delivered:4};
 const lab={Placed:'Order placed',Confirmed:'Confirmed',Packed:'Packed','Out for delivery':'On the way',Delivered:'Delivered',Cancelled:'Cancelled'};

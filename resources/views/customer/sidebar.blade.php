@@ -2,7 +2,7 @@
     $nav = [
         ['route' => 'customer.dashboard',  'label' => 'Home',       'icon' => 'home',  'active' => request()->routeIs('customer.dashboard')],
         ['route' => 'customer.shop',       'label' => 'Shop',       'icon' => 'mega',  'active' => request()->routeIs('customer.shop')],
-        ['route' => 'customer.order',     'label' => 'My orders',  'icon' => 'cart',  'active' => request()->routeIs('customer.order')],
+        ['route' => 'customer.orders',     'label' => 'My orders',  'icon' => 'cart',  'active' => request()->routeIs('customer.orders')],
         ['route' => 'customer.deliveries', 'label' => 'Deliveries', 'icon' => 'truck', 'active' => request()->routeIs('customer.deliveries')],
         ['route' => 'customer.savings',    'label' => 'Savings',    'icon' => 'chart', 'active' => request()->routeIs('customer.savings')],
         ['route' => 'customer.profile',    'label' => 'Profile',    'icon' => 'user',  'active' => request()->routeIs('customer.profile')],
